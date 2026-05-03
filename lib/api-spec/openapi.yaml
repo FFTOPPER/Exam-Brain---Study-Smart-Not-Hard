@@ -3,13 +3,15 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Exam Brain API specification
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: papers
+    description: Past paper upload and analysis
 paths:
   /healthz:
     get:
@@ -24,6 +26,53 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /upload:
+    post:
+      operationId: uploadPapers
+      tags: [papers]
+      summary: Upload past exam papers
+      description: Upload one or more PDF/image files of past question papers (multipart/form-data with field 'files')
+      responses:
+        "200":
+          description: Files uploaded and text extracted successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UploadResult"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /analyze:
+    post:
+      operationId: analyzeTopics
+      tags: [papers]
+      summary: Analyze uploaded papers for topic frequency and exam predictions
+      description: Analyzes extracted text to score topics, generate study plans, and predict exam chances
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AnalyzeRequest"
+      responses:
+        "200":
+          description: Analysis complete
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AnalysisResult"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +83,147 @@ components:
       required:
         - status
 
+    UploadResult:
+      type: object
+      properties:
+        sessionId:
+          type: string
+          description: Unique ID for this upload session
+        filesProcessed:
+          type: integer
+          description: Number of files successfully processed
+        totalText:
+          type: string
+          description: Combined extracted text from all files
+        preview:
+          type: string
+          description: Short preview of extracted text
+      required:
+        - sessionId
+        - filesProcessed
+        - totalText
+        - preview
+
+    AnalyzeRequest:
+      type: object
+      properties:
+        sessionId:
+          type: string
+          description: Session ID from upload step
+        text:
+          type: string
+          description: Raw text to analyze (alternative to sessionId)
+        planDays:
+          type: integer
+          description: Number of days for study plan (2 or 5)
+          enum: [2, 5]
+          default: 2
+
+    TopicScore:
+      type: object
+      properties:
+        topic:
+          type: string
+        frequency:
+          type: integer
+        importancePercent:
+          type: number
+        examChancePercent:
+          type: number
+        priority:
+          type: string
+          enum: [high, medium, low, skip]
+        label:
+          type: string
+          description: Student-friendly label like "Study this first"
+        marksWeight:
+          type: number
+      required:
+        - topic
+        - frequency
+        - importancePercent
+        - examChancePercent
+        - priority
+        - label
+        - marksWeight
+
+    StudyPlanDay:
+      type: object
+      properties:
+        day:
+          type: integer
+        focus:
+          type: array
+          items:
+            type: string
+        goal:
+          type: string
+        timeHours:
+          type: number
+      required:
+        - day
+        - focus
+        - goal
+        - timeHours
+
+    AnalysisResult:
+      type: object
+      properties:
+        topics:
+          type: array
+          items:
+            $ref: "#/components/schemas/TopicScore"
+        topTopics:
+          type: array
+          items:
+            type: string
+          description: Top 3 most important topics
+        skipTopics:
+          type: array
+          items:
+            type: string
+          description: Topics to skip (low impact)
+        studyPlan:
+          type: array
+          items:
+            $ref: "#/components/schemas/StudyPlanDay"
+        overallExamReadiness:
+          type: number
+          description: Overall exam readiness percentage
+        lastNightTopics:
+          type: array
+          items:
+            type: string
+          description: Most critical topics for last-minute study
+        thoughtBubbles:
+          type: array
+          items:
+            type: string
+          description: Smart insight messages to display as floating bubbles
+        paperCount:
+          type: integer
+          description: Number of papers analyzed
+        planDays:
+          type: integer
+          description: Number of days in the study plan
+      required:
+        - topics
+        - topTopics
+        - skipTopics
+        - studyPlan
+        - overallExamReadiness
+        - lastNightTopics
+        - thoughtBubbles
+        - paperCount
+        - planDays
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+      required:
+        - error
+        - message
