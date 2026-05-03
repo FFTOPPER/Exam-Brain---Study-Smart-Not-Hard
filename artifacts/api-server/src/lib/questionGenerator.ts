@@ -21,7 +21,6 @@ export async function generatePracticeQuestions(
       },
     ],
     max_completion_tokens: 400,
-    temperature: 0.7,
   });
 
   const raw = completion.choices[0]?.message?.content ?? "";
@@ -60,7 +59,6 @@ Vary marks (5, 8, 10, 15). Keep questions clear and exam-appropriate.`,
       },
     ],
     max_completion_tokens: 800,
-    temperature: 0.6,
     response_format: { type: "json_object" },
   });
 
