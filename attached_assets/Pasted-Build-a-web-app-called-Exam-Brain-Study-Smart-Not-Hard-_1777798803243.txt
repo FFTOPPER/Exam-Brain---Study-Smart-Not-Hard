@@ -1,0 +1,254 @@
+Build a web app called "Exam Brain – Study Smart, Not Hard".
+
+The app should feel like we are inside a student's mind before an exam.
+
+---
+
+## FRONTEND DESIGN:
+
+* Dark modern UI with glowing accents (blue/purple)
+* Center: a simple animated 3D student model sitting and thinking (use Three.js or a lightweight 3D avatar)
+* Add floating particles/glow to make it feel like "thinking mode"
+
+Above the student:
+
+* Comic-style floating thought bubbles
+
+DEFAULT BUBBLES:
+
+1. "What should I study first?"
+2. "Am I wasting time on wrong topics?"
+3. "What will come in exam?"
+
+---
+
+## AFTER FILE UPLOAD (IMPORTANT):
+
+Replace bubbles with REAL insights from the uploaded document:
+
+* "🔥 Study Virtual Threats first → asked many times"
+* "⚠️ Don't waste time on low impact topics"
+* "🎯 Focus on T5, T6"
+* "⏳ Your 2-day plan is ready"
+
+IMPORTANT:
+Do NOT generate random topics.
+ONLY use topics extracted from the document.
+
+---
+
+## UPLOAD FEATURE:
+
+* Allow multiple uploads (PDF, DOCX, images)
+
+Text extraction:
+
+* PDF → PyMuPDF
+* DOCX → python-docx
+* Images → pytesseract (optional)
+
+---
+
+## CORE BACKEND LOGIC (VERY IMPORTANT):
+
+STEP 1: EXTRACT TOPICS PROPERLY
+
+Topics exist in structured format like:
+"Security Policy Implementation Concepts – T1"
+
+Write regex logic to extract:
+
+* Topic name
+* Topic code (T1, T2, ...)
+
+Store as:
+{
+"T1": "Security Policy Implementation Concepts",
+"T2": "Types of Security Policies",
+...
+}
+
+---
+
+STEP 2: MAP QUESTIONS TO TOPICS
+
+Each question references topic codes like:
+T1, T2, T5...
+
+Count how many times each topic appears.
+
+This gives REAL frequency.
+
+---
+
+STEP 3: CALCULATE IMPORTANCE
+
+For each topic:
+
+importance_score = frequency
+
+Label:
+
+* HIGH → frequency >= 4
+* MEDIUM → 2–3
+* LOW → 1
+
+---
+
+STEP 4: GENERATE SMART OUTPUT
+
+For each topic display:
+
+* Topic Name
+* Topic Code
+* Times Asked
+* Priority Label
+
+Example:
+"Virtual Threats (T5) → Asked 6 times → HIGH priority"
+
+---
+
+STEP 5: GENERATE PRACTICE QUESTIONS (CRITICAL FEATURE)
+
+For HIGH and MEDIUM topics:
+
+Use OpenAI API to generate 3 exam-style questions.
+
+Prompt:
+"Generate 3 university exam questions for the topic: {topic}. Keep them simple and exam-focused."
+
+Display under each topic:
+
+* Expandable section
+* Bullet points
+
+---
+
+STEP 6: SMART STUDY PLAN
+
+Ask user:
+
+* Number of days (2 or 5)
+
+Generate plan:
+
+Day 1:
+
+* HIGH topics
+
+Day 2:
+
+* Remaining HIGH + MEDIUM
+
+LOW topics:
+
+* Show as "Skip if short on time"
+
+---
+
+STEP 7: LAST NIGHT MODE
+
+Add button: "Last Night Mode"
+
+When clicked:
+
+* Show only TOP 5 most frequent topics
+* Show only:
+
+  * Topic name
+  * Practice questions
+* Hide everything else
+
+---
+
+STEP 8: UI OUTPUT
+
+LEFT SIDE:
+
+* 3D student
+* Thought bubbles showing:
+
+  * Top topic
+  * What to skip
+  * Study plan ready
+
+RIGHT SIDE PANEL:
+
+* Topic list with bars (importance)
+* "Asked X times"
+* Practice questions dropdown
+* Study plan section
+
+---
+
+STEP 9: SIMPLE LANGUAGE (IMPORTANT)
+
+Use student-friendly wording:
+
+GOOD:
+
+* "Study this first"
+* "Asked many times"
+* "High chance in exam"
+* "Skip if short on time"
+
+BAD:
+
+* "Topic frequency analysis"
+* "Predictive modeling"
+
+---
+
+STEP 10: CHARTS
+
+Use Chart.js:
+
+* Bar chart → topics vs frequency
+
+---
+
+STEP 11: EXTRA (BONUS FEATURE)
+
+Add button:
+"Generate Expected Question Paper"
+
+* Create 5 questions using top topics
+* Match exam style
+
+---
+
+## TECH STACK:
+
+Backend:
+
+* Python (FastAPI)
+
+Frontend:
+
+* HTML/CSS/JS (or React if fast)
+
+3D:
+
+* Three.js (simple floating model)
+
+---
+
+## IMPORTANT RULES:
+
+* Do NOT generate fake topics
+* Only use extracted document content
+* Keep UI clean, not cluttered
+* Focus on usefulness over complexity
+
+---
+
+## FINAL GOAL:
+
+The student should feel:
+
+"This app is telling me exactly what to study and what to ignore."
+
+NOT:
+
+"This is just another dashboard"

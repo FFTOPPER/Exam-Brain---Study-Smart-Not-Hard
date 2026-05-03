@@ -20,6 +20,10 @@ import type {
   AnalysisResult,
   AnalyzeRequest,
   ErrorResponse,
+  GeneratePaperRequest,
+  GeneratePaperResult,
+  GenerateQuestionsRequest,
+  GenerateQuestionsResult,
   HealthStatus,
   UploadResult,
 } from "./api.schemas";
@@ -110,7 +114,7 @@ export function useHealthCheck<
 }
 
 /**
- * Upload one or more PDF/image files of past question papers (multipart/form-data with field 'files')
+ * Upload one or more PDF/Word/image files of past question papers (multipart/form-data with field 'files')
  * @summary Upload past exam papers
  */
 export const getUploadPapersUrl = () => {
@@ -276,4 +280,178 @@ export const useAnalyzeTopics = <
   TContext
 > => {
   return useMutation(getAnalyzeTopicsMutationOptions(options));
+};
+
+/**
+ * Uses AI to generate exam-style practice questions for the given topic
+ * @summary Generate AI practice questions for a topic
+ */
+export const getGenerateQuestionsUrl = () => {
+  return `/api/generate-questions`;
+};
+
+export const generateQuestions = async (
+  generateQuestionsRequest: GenerateQuestionsRequest,
+  options?: RequestInit,
+): Promise<GenerateQuestionsResult> => {
+  return customFetch<GenerateQuestionsResult>(getGenerateQuestionsUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(generateQuestionsRequest),
+  });
+};
+
+export const getGenerateQuestionsMutationOptions = <
+  TError = ErrorType<ErrorResponse>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof generateQuestions>>,
+    TError,
+    { data: BodyType<GenerateQuestionsRequest> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof generateQuestions>>,
+  TError,
+  { data: BodyType<GenerateQuestionsRequest> },
+  TContext
+> => {
+  const mutationKey = ["generateQuestions"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof generateQuestions>>,
+    { data: BodyType<GenerateQuestionsRequest> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return generateQuestions(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type GenerateQuestionsMutationResult = NonNullable<
+  Awaited<ReturnType<typeof generateQuestions>>
+>;
+export type GenerateQuestionsMutationBody = BodyType<GenerateQuestionsRequest>;
+export type GenerateQuestionsMutationError = ErrorType<ErrorResponse>;
+
+/**
+ * @summary Generate AI practice questions for a topic
+ */
+export const useGenerateQuestions = <
+  TError = ErrorType<ErrorResponse>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof generateQuestions>>,
+    TError,
+    { data: BodyType<GenerateQuestionsRequest> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof generateQuestions>>,
+  TError,
+  { data: BodyType<GenerateQuestionsRequest> },
+  TContext
+> => {
+  return useMutation(getGenerateQuestionsMutationOptions(options));
+};
+
+/**
+ * Uses AI to generate a complete exam paper with 5 questions from the most important topics
+ * @summary Generate a full expected question paper from top topics
+ */
+export const getGeneratePaperUrl = () => {
+  return `/api/generate-paper`;
+};
+
+export const generatePaper = async (
+  generatePaperRequest: GeneratePaperRequest,
+  options?: RequestInit,
+): Promise<GeneratePaperResult> => {
+  return customFetch<GeneratePaperResult>(getGeneratePaperUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(generatePaperRequest),
+  });
+};
+
+export const getGeneratePaperMutationOptions = <
+  TError = ErrorType<ErrorResponse>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof generatePaper>>,
+    TError,
+    { data: BodyType<GeneratePaperRequest> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof generatePaper>>,
+  TError,
+  { data: BodyType<GeneratePaperRequest> },
+  TContext
+> => {
+  const mutationKey = ["generatePaper"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof generatePaper>>,
+    { data: BodyType<GeneratePaperRequest> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return generatePaper(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type GeneratePaperMutationResult = NonNullable<
+  Awaited<ReturnType<typeof generatePaper>>
+>;
+export type GeneratePaperMutationBody = BodyType<GeneratePaperRequest>;
+export type GeneratePaperMutationError = ErrorType<ErrorResponse>;
+
+/**
+ * @summary Generate a full expected question paper from top topics
+ */
+export const useGeneratePaper = <
+  TError = ErrorType<ErrorResponse>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof generatePaper>>,
+    TError,
+    { data: BodyType<GeneratePaperRequest> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof generatePaper>>,
+  TError,
+  { data: BodyType<GeneratePaperRequest> },
+  TContext
+> => {
+  return useMutation(getGeneratePaperMutationOptions(options));
 };

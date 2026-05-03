@@ -16,7 +16,7 @@ export const HealthCheckResponse = zod.object({
 });
 
 /**
- * Upload one or more PDF/image files of past question papers (multipart/form-data with field 'files')
+ * Upload one or more PDF/Word/image files of past question papers (multipart/form-data with field 'files')
  * @summary Upload past exam papers
  */
 export const UploadPapersResponse = zod.object({
@@ -50,6 +50,11 @@ export const AnalyzeTopicsResponse = zod.object({
   topics: zod.array(
     zod.object({
       topic: zod.string(),
+      topicCode: zod
+        .string()
+        .describe(
+          "Extracted topic code e.g. T1, T2 (empty string if not found)",
+        ),
       frequency: zod.number(),
       importancePercent: zod.number(),
       examChancePercent: zod.number(),
@@ -58,6 +63,9 @@ export const AnalyzeTopicsResponse = zod.object({
         .string()
         .describe('Student-friendly label like \"Study this first\"'),
       marksWeight: zod.number(),
+      timesAsked: zod
+        .number()
+        .describe("How many times this topic appeared in questions"),
     }),
   ),
   topTopics: zod.array(zod.string()).describe("Top 3 most important topics"),
@@ -81,4 +89,50 @@ export const AnalyzeTopicsResponse = zod.object({
     .describe("Smart insight messages to display as floating bubbles"),
   paperCount: zod.number().describe("Number of papers analyzed"),
   planDays: zod.number().describe("Number of days in the study plan"),
+});
+
+/**
+ * Uses AI to generate exam-style practice questions for the given topic
+ * @summary Generate AI practice questions for a topic
+ */
+export const generateQuestionsBodyCountDefault = 3;
+
+export const GenerateQuestionsBody = zod.object({
+  topic: zod.string().describe("Topic name to generate questions for"),
+  topicCode: zod
+    .string()
+    .optional()
+    .describe("Topic code (e.g. T1) if available"),
+  count: zod
+    .number()
+    .default(generateQuestionsBodyCountDefault)
+    .describe("Number of questions to generate"),
+});
+
+export const GenerateQuestionsResponse = zod.object({
+  topic: zod.string(),
+  questions: zod.array(zod.string()).describe("List of exam-style questions"),
+});
+
+/**
+ * Uses AI to generate a complete exam paper with 5 questions from the most important topics
+ * @summary Generate a full expected question paper from top topics
+ */
+export const GeneratePaperBody = zod.object({
+  topics: zod
+    .array(zod.string())
+    .describe("List of top topic names to use for question paper"),
+});
+
+export const GeneratePaperResponse = zod.object({
+  title: zod.string(),
+  questions: zod.array(
+    zod.object({
+      number: zod.number(),
+      question: zod.string(),
+      topic: zod.string(),
+      marks: zod.number(),
+    }),
+  ),
+  generatedAt: zod.string(),
 });

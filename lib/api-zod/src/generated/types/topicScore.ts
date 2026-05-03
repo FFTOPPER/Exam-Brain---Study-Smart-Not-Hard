@@ -9,6 +9,8 @@ import type { TopicScorePriority } from "./topicScorePriority";
 
 export interface TopicScore {
   topic: string;
+  /** Extracted topic code e.g. T1, T2 (empty string if not found) */
+  topicCode: string;
   frequency: number;
   importancePercent: number;
   examChancePercent: number;
@@ -16,4 +18,6 @@ export interface TopicScore {
   /** Student-friendly label like "Study this first" */
   label: string;
   marksWeight: number;
+  /** How many times this topic appeared in questions */
+  timesAsked: number;
 }

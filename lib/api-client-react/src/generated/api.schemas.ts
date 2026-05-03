@@ -52,6 +52,8 @@ export const TopicScorePriority = {
 
 export interface TopicScore {
   topic: string;
+  /** Extracted topic code e.g. T1, T2 (empty string if not found) */
+  topicCode: string;
   frequency: number;
   importancePercent: number;
   examChancePercent: number;
@@ -59,6 +61,8 @@ export interface TopicScore {
   /** Student-friendly label like "Study this first" */
   label: string;
   marksWeight: number;
+  /** How many times this topic appeared in questions */
+  timesAsked: number;
 }
 
 export interface StudyPlanDay {
@@ -85,6 +89,39 @@ export interface AnalysisResult {
   paperCount: number;
   /** Number of days in the study plan */
   planDays: number;
+}
+
+export interface GenerateQuestionsRequest {
+  /** Topic name to generate questions for */
+  topic: string;
+  /** Topic code (e.g. T1) if available */
+  topicCode?: string;
+  /** Number of questions to generate */
+  count?: number;
+}
+
+export interface GenerateQuestionsResult {
+  topic: string;
+  /** List of exam-style questions */
+  questions: string[];
+}
+
+export interface GeneratePaperRequest {
+  /** List of top topic names to use for question paper */
+  topics: string[];
+}
+
+export interface PaperQuestion {
+  number: number;
+  question: string;
+  topic: string;
+  marks: number;
+}
+
+export interface GeneratePaperResult {
+  title: string;
+  questions: PaperQuestion[];
+  generatedAt: string;
 }
 
 export interface ErrorResponse {

@@ -54,7 +54,7 @@ export function UploadArea({ onAnalyze, isAnalyzing }: UploadAreaProps) {
         <input
           type="file"
           multiple
-          accept=".pdf,image/*"
+          accept=".pdf,.doc,.docx,.txt,image/*"
           onChange={handleChange}
           className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
           disabled={isAnalyzing}
@@ -64,7 +64,7 @@ export function UploadArea({ onAnalyze, isAnalyzing }: UploadAreaProps) {
           <div className="space-y-2 pointer-events-none">
             <UploadCloud className="w-10 h-10 mx-auto text-muted-foreground" />
             <p className="text-sm font-medium">Drag & drop your past papers here</p>
-            <p className="text-xs text-muted-foreground">Supports PDF and Images</p>
+            <p className="text-xs text-muted-foreground">Supports PDF, Word (.docx) and Images</p>
           </div>
         ) : (
           <div className="space-y-4">

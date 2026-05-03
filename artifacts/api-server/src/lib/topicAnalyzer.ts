@@ -1,6 +1,8 @@
 interface RawTopic {
   topic: string;
+  topicCode: string;
   frequency: number;
+  timesAsked: number;
   marksWeight: number;
   recentScore: number;
 }
@@ -23,31 +25,80 @@ const STOP_WORDS = new Set([
   "examples","fig","figure","table","unit","chapter","page","time","year",
   "years","use","using","used","uses","based","given","number","data","type",
   "types","method","methods","system","value","values","result","results",
-  "following","following","form","forms","function","functions",
+  "form","forms","function","functions",
 ]);
 
 const SUBJECT_KEYWORDS: Record<string, string[]> = {
   "Algebra": ["algebra","polynomial","equation","quadratic","linear","matrix","determinant","eigenvalue","vector","factoring","binomial","logarithm","exponent","inequality","variable","coefficient"],
-  "Calculus": ["calculus","differentiation","integration","derivative","integral","limit","differential","partial","gradient","chain rule","taylor","maclaurin","convergence","series","sequence"],
+  "Calculus": ["calculus","differentiation","integration","derivative","integral","limit","differential","partial","gradient","taylor","maclaurin","convergence","series","sequence"],
   "Geometry": ["geometry","triangle","circle","polygon","angle","coordinate","euclidean","congruent","similar","area","perimeter","volume","surface","transformation","rotation","reflection"],
-  "Probability": ["probability","statistics","distribution","random","variance","standard deviation","mean","median","mode","sample","population","hypothesis","regression","correlation","bayes","normal"],
-  "Thermodynamics": ["thermodynamics","heat","temperature","entropy","enthalpy","energy","work","pressure","volume","ideal gas","carnot","isothermal","adiabatic","specific heat","calorimetry"],
+  "Probability & Statistics": ["probability","statistics","distribution","random","variance","standard deviation","mean","median","mode","sample","population","hypothesis","regression","correlation","bayes","normal"],
+  "Thermodynamics": ["thermodynamics","heat","temperature","entropy","enthalpy","energy","work","pressure","carnot","isothermal","adiabatic","specific heat","calorimetry"],
   "Mechanics": ["mechanics","force","velocity","acceleration","momentum","torque","friction","gravity","projectile","circular motion","newton","kinetic","potential","equilibrium","displacement"],
-  "Electricity": ["electricity","electric","current","voltage","resistance","capacitor","inductor","circuit","power","ohm","kirchhoff","magnetic","flux","electromagnetic","charge","field"],
-  "Waves & Optics": ["wave","optics","refraction","reflection","diffraction","interference","wavelength","frequency","amplitude","sound","light","spectrum","lens","mirror","polarization"],
-  "Chemistry": ["chemistry","chemical","reaction","molecule","atom","compound","element","bond","acid","base","oxidation","reduction","equilibrium","catalyst","organic","inorganic","solution","solubility"],
-  "Biology": ["biology","cell","dna","rna","protein","gene","genetics","evolution","ecosystem","photosynthesis","respiration","enzyme","membrane","organism","species","mutation","chromosome"],
-  "Programming": ["algorithm","data structure","array","linked list","tree","graph","sorting","searching","recursion","complexity","pointer","stack","queue","hash","binary","complexity"],
-  "Networking": ["network","protocol","tcp","ip","http","dns","routing","switching","bandwidth","latency","firewall","encryption","socket","packet","ethernet","wireless","subnet"],
-  "Database": ["database","sql","query","table","join","index","transaction","normalization","relational","schema","primary key","foreign key","acid","nosql","mongodb"],
+  "Electricity & Magnetism": ["electricity","electric","current","voltage","resistance","capacitor","inductor","circuit","power","ohm","kirchhoff","magnetic","flux","electromagnetic","charge"],
+  "Waves & Optics": ["wave","optics","refraction","reflection","diffraction","interference","wavelength","amplitude","sound","spectrum","lens","mirror","polarization"],
+  "Chemistry": ["chemistry","chemical","reaction","molecule","atom","compound","element","bond","acid","base","oxidation","reduction","equilibrium","catalyst","organic","inorganic","solution"],
+  "Biology": ["biology","cell","dna","rna","protein","gene","genetics","evolution","ecosystem","photosynthesis","respiration","enzyme","membrane","organism","species","mutation"],
+  "Data Structures & Algorithms": ["algorithm","data structure","array","linked list","tree","graph","sorting","searching","recursion","complexity","pointer","stack","queue","hash","binary"],
+  "Computer Networks": ["network","protocol","tcp","ip","http","dns","routing","switching","bandwidth","latency","firewall","socket","packet","ethernet","wireless","subnet","osi"],
+  "Database Systems": ["database","sql","query","table","join","index","transaction","normalization","relational","schema","primary key","foreign key","acid","nosql"],
   "Operating Systems": ["operating system","process","thread","scheduling","memory","paging","semaphore","deadlock","file system","interrupt","virtual memory","cache","synchronization"],
+  "Cybersecurity": ["security","threat","vulnerability","attack","malware","virus","encryption","authentication","firewall","intrusion","policy","risk","penetration","exploit","phishing","ransomware","cyber"],
+  "Software Engineering": ["software","requirement","design","testing","agile","scrum","sdlc","uml","object oriented","class","inheritance","polymorphism","abstraction","encapsulation"],
+  "Artificial Intelligence": ["artificial intelligence","machine learning","neural","deep learning","classification","regression","clustering","supervised","unsupervised","training","decision tree"],
   "Economics": ["economics","supply","demand","market","price","inflation","gdp","trade","fiscal","monetary","elasticity","utility","marginal","microeconomics","macroeconomics","cost","revenue"],
-  "History": ["history","revolution","empire","war","treaty","civilization","colonial","independence","democracy","monarchy","reform","industrial","world war","ancient","medieval","modern"],
-  "Literature": ["literature","poem","poetry","novel","drama","theme","character","plot","symbolism","metaphor","narrative","author","genre","prose","fiction","literary","analysis"],
-  "Accounting": ["accounting","balance sheet","income statement","asset","liability","equity","debit","credit","journal","ledger","depreciation","revenue","expense","audit","financial","ratio"],
-  "Marketing": ["marketing","brand","consumer","product","promotion","advertising","market","segmentation","positioning","pricing","strategy","customer","campaign","digital","social media"],
-  "Management": ["management","leadership","organization","planning","control","strategy","decision","motivation","communication","human resource","operation","supply chain","project","quality"],
+  "Accounting": ["accounting","balance sheet","income statement","asset","liability","equity","debit","credit","journal","ledger","depreciation","revenue","expense","audit","financial"],
+  "Marketing": ["marketing","brand","consumer","product","promotion","advertising","market","segmentation","positioning","pricing","strategy","customer","campaign"],
+  "Management": ["management","leadership","organization","planning","control","strategy","decision","motivation","communication","human resource","operation","supply chain","project"],
 };
+
+/**
+ * Extract structured topics from text that follow patterns like:
+ * "Security Policy Implementation Concepts – T1"
+ * "T1 - Network Security" / "Topic 1: Calculus"
+ */
+function extractTopicCodes(text: string): Map<string, string> {
+  const codeToName = new Map<string, string>();
+
+  const patterns: RegExp[] = [
+    /([A-Za-z][A-Za-z0-9 ,&/'\-]{3,80})\s*[–\-—]\s*(T\d{1,2})\b/gi,
+    /([A-Za-z][A-Za-z0-9 ,&/'\-]{3,80})\s*\(\s*(T\d{1,2})\s*\)/gi,
+    /(T\d{1,2})\s*[–\-—:]\s*([A-Za-z][A-Za-z0-9 ,&/'\- ]{3,80})/gi,
+    /(T\d{1,2})\.\s+([A-Za-z][A-Za-z0-9 ,&/'\- ]{3,80})/gi,
+  ];
+
+  for (const pattern of patterns) {
+    let match: RegExpExecArray | null;
+    pattern.lastIndex = 0;
+    while ((match = pattern.exec(text)) !== null) {
+      const part1 = match[1]?.trim() ?? "";
+      const part2 = match[2]?.trim() ?? "";
+      let code: string, name: string;
+      if (/^T\d+$/i.test(part1)) {
+        code = part1.toUpperCase();
+        name = part2;
+      } else {
+        code = part2.toUpperCase();
+        name = part1;
+      }
+      if (!codeToName.has(code) && name.length > 3 && name.length < 120) {
+        codeToName.set(code, name);
+      }
+    }
+  }
+
+  return codeToName;
+}
+
+function countTopicCodeMentions(text: string, codes: string[]): Map<string, number> {
+  const counts = new Map<string, number>();
+  for (const code of codes) {
+    const pattern = new RegExp(`\\b${code}\\b`, "gi");
+    const matches = text.match(pattern);
+    counts.set(code, matches ? matches.length : 1);
+  }
+  return counts;
+}
 
 function extractKeywords(text: string): Map<string, number> {
   const cleaned = text
@@ -66,7 +117,8 @@ function extractKeywords(text: string): Map<string, number> {
 }
 
 function detectMarksWeight(text: string, topic: string): number {
-  const pattern = new RegExp(`${topic.toLowerCase()}[^.]{0,100}(\\d+)\\s*marks?`, "gi");
+  const escaped = topic.toLowerCase().replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const pattern = new RegExp(`${escaped}[^.]{0,100}(\\d+)\\s*marks?`, "gi");
   const matches = [...text.matchAll(pattern)];
   if (matches.length === 0) return 5;
   const total = matches.reduce((sum, m) => sum + parseInt(m[1], 10), 0);
@@ -86,10 +138,29 @@ function detectRecentScore(text: string, topic: string): number {
 }
 
 export function analyzeText(text: string): RawTopic[] {
-  const wordFreq = extractKeywords(text);
+  const codeToName = extractTopicCodes(text);
+  const codeMentions = countTopicCodeMentions(text, Array.from(codeToName.keys()));
   const topicScores = new Map<string, RawTopic>();
 
+  if (codeToName.size > 0) {
+    for (const [code, name] of codeToName.entries()) {
+      const timesAsked = codeMentions.get(code) || 1;
+      const marksWeight = detectMarksWeight(text, name);
+      const recentScore = detectRecentScore(text, name);
+      topicScores.set(name, {
+        topic: name,
+        topicCode: code,
+        frequency: timesAsked,
+        timesAsked,
+        marksWeight,
+        recentScore,
+      });
+    }
+  }
+
+  const wordFreq = extractKeywords(text);
   for (const [topicName, keywords] of Object.entries(SUBJECT_KEYWORDS)) {
+    if (topicScores.has(topicName)) continue;
     let totalFreq = 0;
     for (const kw of keywords) {
       totalFreq += wordFreq.get(kw) || 0;
@@ -102,24 +173,35 @@ export function analyzeText(text: string): RawTopic[] {
     if (totalFreq > 0) {
       const marksWeight = detectMarksWeight(text, topicName);
       const recentScore = detectRecentScore(text, keywords[0]);
-      topicScores.set(topicName, { topic: topicName, frequency: totalFreq, marksWeight, recentScore });
+      topicScores.set(topicName, {
+        topic: topicName,
+        topicCode: "",
+        frequency: totalFreq,
+        timesAsked: totalFreq,
+        marksWeight,
+        recentScore,
+      });
     }
   }
 
-  const unknown = Array.from(wordFreq.entries())
-    .filter(([w, f]) => f >= 3 && w.length > 5)
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 5)
-    .map(([w, f]) => ({
-      topic: w.charAt(0).toUpperCase() + w.slice(1),
-      frequency: f,
-      marksWeight: 5,
-      recentScore: 0.5,
-    }));
+  if (topicScores.size < 3) {
+    const unknown = Array.from(wordFreq.entries())
+      .filter(([w, f]) => f >= 3 && w.length > 5)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5)
+      .map(([w, f]) => ({
+        topic: w.charAt(0).toUpperCase() + w.slice(1),
+        topicCode: "",
+        frequency: f,
+        timesAsked: f,
+        marksWeight: 5,
+        recentScore: 0.5,
+      }));
 
-  for (const t of unknown) {
-    if (!topicScores.has(t.topic)) {
-      topicScores.set(t.topic, t);
+    for (const t of unknown) {
+      if (!topicScores.has(t.topic)) {
+        topicScores.set(t.topic, t);
+      }
     }
   }
 
@@ -128,7 +210,9 @@ export function analyzeText(text: string): RawTopic[] {
 
 export function scoreTopics(raw: RawTopic[], paperCount: number): Array<{
   topic: string;
+  topicCode: string;
   frequency: number;
+  timesAsked: number;
   importancePercent: number;
   examChancePercent: number;
   priority: "high" | "medium" | "low" | "skip";
@@ -163,10 +247,20 @@ export function scoreTopics(raw: RawTopic[], paperCount: number): Array<{
       label = "Good to know";
     } else {
       priority = "skip";
-      label = "Don't waste time here";
+      label = "Skip if short on time";
     }
 
-    return { topic: t.topic, frequency: t.frequency, importancePercent, examChancePercent, priority, label, marksWeight: t.marksWeight };
+    return {
+      topic: t.topic,
+      topicCode: t.topicCode,
+      frequency: t.frequency,
+      timesAsked: t.timesAsked,
+      importancePercent,
+      examChancePercent,
+      priority,
+      label,
+      marksWeight: t.marksWeight,
+    };
   });
 
   return scored.sort((a, b) => b.importancePercent - a.importancePercent);
@@ -180,12 +274,16 @@ export function generateStudyPlan(
   const chunkSize = Math.ceil(highPriority.length / planDays);
 
   return Array.from({ length: planDays }, (_, i) => {
-    const dayTopics = highPriority.slice(i * chunkSize, (i + 1) * chunkSize).map(t => t.topic);
+    const dayTopics = highPriority.slice(i * chunkSize, (i + 1) * chunkSize).map(t =>
+      t.topicCode ? `${t.topic} (${t.topicCode})` : t.topic
+    );
     const isLastDay = i === planDays - 1;
     return {
       day: i + 1,
       focus: dayTopics.length > 0 ? dayTopics : ["Review previous topics"],
-      goal: isLastDay ? "Revise all important topics and practice past questions" : `Master ${dayTopics.slice(0, 2).join(" and ")}`,
+      goal: isLastDay
+        ? "Revise all important topics and practice past questions"
+        : `Master ${dayTopics.slice(0, 2).join(" and ")}`,
       timeHours: i === 0 ? 4 : isLastDay ? 3 : 4,
     };
   });
@@ -201,10 +299,19 @@ export function generateThoughtBubbles(
     : 0;
 
   const bubbles: string[] = [];
-  if (top[0]) bubbles.push(`🔥 Study THIS first → ${top[0].examChancePercent}% chance`);
-  if (skip[0]) bubbles.push(`⚠️ Skip this → low marks impact`);
-  if (top[0] && top[1]) bubbles.push(`🎯 Focus: ${top[0].topic} & ${top[1].topic}`);
-  bubbles.push(`⏳ Your plan is ready`);
-  if (overall > 0) bubbles.push(`📊 Overall readiness: ${overall}%`);
+  if (top[0]) {
+    const label = top[0].topicCode
+      ? `${top[0].topic} (${top[0].topicCode})`
+      : top[0].topic;
+    bubbles.push(`🔥 Study THIS first → ${label} asked ${top[0].timesAsked}× times`);
+  }
+  if (skip[0]) bubbles.push(`⚠️ Skip "${skip[0].topic}" → low marks impact`);
+  if (top[0] && top[1]) {
+    const t1 = top[0].topicCode || top[0].topic.split(" ")[0];
+    const t2 = top[1].topicCode || top[1].topic.split(" ")[0];
+    bubbles.push(`🎯 Focus on ${t1} & ${t2}`);
+  }
+  bubbles.push(`⏳ Your ${topics.length > 0 ? "" : ""}plan is ready`);
+  if (overall > 0) bubbles.push(`📊 Exam readiness: ${overall}%`);
   return bubbles;
 }

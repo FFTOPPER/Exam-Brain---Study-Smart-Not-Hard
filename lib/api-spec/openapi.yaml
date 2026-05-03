@@ -32,7 +32,7 @@ paths:
       operationId: uploadPapers
       tags: [papers]
       summary: Upload past exam papers
-      description: Upload one or more PDF/image files of past question papers (multipart/form-data with field 'files')
+      description: Upload one or more PDF/Word/image files of past question papers (multipart/form-data with field 'files')
       responses:
         "200":
           description: Files uploaded and text extracted successfully
@@ -66,6 +66,58 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/AnalysisResult"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /generate-questions:
+    post:
+      operationId: generateQuestions
+      tags: [papers]
+      summary: Generate AI practice questions for a topic
+      description: Uses AI to generate exam-style practice questions for the given topic
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GenerateQuestionsRequest"
+      responses:
+        "200":
+          description: Questions generated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GenerateQuestionsResult"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /generate-paper:
+    post:
+      operationId: generatePaper
+      tags: [papers]
+      summary: Generate a full expected question paper from top topics
+      description: Uses AI to generate a complete exam paper with 5 questions from the most important topics
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GeneratePaperRequest"
+      responses:
+        "200":
+          description: Question paper generated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GeneratePaperResult"
         "400":
           description: Bad request
           content:
@@ -124,6 +176,9 @@ components:
       properties:
         topic:
           type: string
+        topicCode:
+          type: string
+          description: Extracted topic code e.g. T1, T2 (empty string if not found)
         frequency:
           type: integer
         importancePercent:
@@ -138,14 +193,19 @@ components:
           description: Student-friendly label like "Study this first"
         marksWeight:
           type: number
+        timesAsked:
+          type: integer
+          description: How many times this topic appeared in questions
       required:
         - topic
+        - topicCode
         - frequency
         - importancePercent
         - examChancePercent
         - priority
         - label
         - marksWeight
+        - timesAsked
 
     StudyPlanDay:
       type: object
@@ -216,6 +276,80 @@ components:
         - thoughtBubbles
         - paperCount
         - planDays
+
+    GenerateQuestionsRequest:
+      type: object
+      properties:
+        topic:
+          type: string
+          description: Topic name to generate questions for
+        topicCode:
+          type: string
+          description: Topic code (e.g. T1) if available
+        count:
+          type: integer
+          description: Number of questions to generate
+          default: 3
+      required:
+        - topic
+
+    GenerateQuestionsResult:
+      type: object
+      properties:
+        topic:
+          type: string
+        questions:
+          type: array
+          items:
+            type: string
+          description: List of exam-style questions
+      required:
+        - topic
+        - questions
+
+    GeneratePaperRequest:
+      type: object
+      properties:
+        topics:
+          type: array
+          items:
+            type: string
+          description: List of top topic names to use for question paper
+      required:
+        - topics
+
+    GeneratePaperResult:
+      type: object
+      properties:
+        title:
+          type: string
+        questions:
+          type: array
+          items:
+            $ref: "#/components/schemas/PaperQuestion"
+        generatedAt:
+          type: string
+      required:
+        - title
+        - questions
+        - generatedAt
+
+    PaperQuestion:
+      type: object
+      properties:
+        number:
+          type: integer
+        question:
+          type: string
+        topic:
+          type: string
+        marks:
+          type: integer
+      required:
+        - number
+        - question
+        - topic
+        - marks
 
     ErrorResponse:
       type: object
