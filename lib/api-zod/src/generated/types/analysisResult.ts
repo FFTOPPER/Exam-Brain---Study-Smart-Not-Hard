@@ -5,6 +5,7 @@
  * Exam Brain API specification
  * OpenAPI spec version: 0.1.0
  */
+import type { QuestionTypeDistribution } from "./questionTypeDistribution";
 import type { StudyPlanDay } from "./studyPlanDay";
 import type { TopicScore } from "./topicScore";
 
@@ -25,4 +26,6 @@ export interface AnalysisResult {
   paperCount: number;
   /** Number of days in the study plan */
   planDays: number;
+  /** Distribution of question types found in papers */
+  questionTypeDistribution: QuestionTypeDistribution;
 }

@@ -1,0 +1,95 @@
+UnsaidTalks
+AI DecodeX Hackathon
+Problem : Past paper analyzer that maps topic frequency against syllabus, ranks
+high-yield topics, and generates a smart study planner
+Problem Statement
+Students often rely on past question papers to prepare for exams but lack a structured
+way to analyze trends and identify important topics. Manually reviewing multiple years
+of papers is time-consuming and fails to reveal deeper patterns or question frequency
+across topics. As a result, students struggle to prioritize high-impact topics and prepare
+strategically, leading to inefficient study sessions and lower exam performance. Build an
+AI-powered system that analyzes past papers and syllabus to identify patterns, predict
+important topics, and guide smarter exam preparation.
+Students / users often struggle with:
+● Identifying which topics appear most frequently across multiple years of question
+papers.
+● Understanding question patterns — phrasing styles, difficulty distribution, and
+marking schemes.
+● Aligning study priorities with the actual exam syllabus and historical trends.
+● Spending too much time on low-yield topics while missing high-frequency
+concepts.
+To solve this, build an AI-powered app that allows users to get:
+● Multi-paper upload — accept past question papers (PDF/image) spanning multiple
+years and subjects.
+● AI pattern analysis — identify topic frequency, question type distribution, and
+year-wise trends.
+● Syllabus cross-referencing — map extracted topics against the official syllabus to
+● highlight coverage gaps.
+● Topic importance scoring — rank topics by predicted exam weight based on
+historical patterns.
+● Smart study planner — auto-generate a prioritized study schedule based on
+analysis results.
+● Visual analytics dashboard — charts showing topic frequency, difficulty trends,
+and coverage heatmaps.
+● Practice question suggestions — recommend similar questions for high-priority
+topics.
+UnsaidTalks
+EVALUATION CRITERIA:
+● Impact (20%) - How effectively does it work?
+● Innovation (20%) - Is the approach creative and unique?
+● Technical Execution (20%) - Code quality and functionality including ReadMe
+file quality.
+● User Experience (25%) – Design, ease of use; hosted and publicly accessible
+solutions will receive bonus consideration.
+● Presentation (15%) - Quality of demo video and explanation. Record your demo
+video and upload on google drive and put the link in your ReadMe file of github
+Project.
+Submission Guidelines:
+● Users must submit the link to their GitHub repository on the competition portal
+(Unstop, where you completed your hackathon registration).
+● The GitHub repository must be public. Private repositories will lead to
+disqualification.
+● The complete source code of the project must be present in the repository.
+Submissions without code will not be considered valid.
+● Mandatory: Include a screen-recording video link of your live, working project
+in the README.md of your GitHub repository.
+● Hosting the project is optional but will give you an edge during evaluation.
+FAQs
+Q. What Tech Stack to use?
+A. You can use any tech stack as per your expertise.
+Q. Can I use AI to build the solution?
+A. Yes you can use AI Tools like ChatGPT, Emergent, Co-Pilot etc. to build the solution for
+rapid prototyping. But make sure you understand the platform that you have built.
+Q. Will I get a certificate?
+A. Yes, but only if you have done a Valid Submission.
+Q. When will the results be announced?
+A. The results will be announced within a week's time of the hackathon submission.
+Q. When will the certificates be given?
+A. Certificates will be issued only to Valid submissions defined as public gitHub
+Repository and a working prototype as per the problem statement. The certificates will
+be issued within 7 Days of the hackathon.
+UnsaidTalks
+Q. How will I get the certificate?
+A. You will get a digital verifiable certificate via your email within 7 days of the
+hackathon.
+Q. How much time do I have to make the submission?
+A. Submission Deadline is 3rd May, 2026 06:00 PM. You can check Unstop Portal.
+Q. I have more doubts, how can I contact the UnsaidTalks Team?
+A. You can reach out @ +91-7303573374 on whatsapp or @ info@unsaidtalks.com if you
+have any doubts or feedback for us.
+Q. Where do I have to submit the solution?
+A. You need to upload the code in your public github repository and submit the link on
+the unstop portal where you did registration.
+Q. Who is organizing this Hackathon?
+A. This hackathon is organised by UnsaidTalks Education (www.unsaidtalks.com) —
+one of India’s leading mentorship platforms that has helped 1000+ students become
+interview-ready and crack internships and full-time roles through guidance from
+industry professionals at Google, Amazon, Microsoft, and other top tech companies.
+At UnsaidTalks, we run our flagship UnsaidTalks Mentorship Program, designed to help
+you build strong fundamentals, gain real clarity on interview preparation, and follow a
+structured roadmap that most students miss out on while preparing alone.
+Many students who delay structured preparation often struggle during placement
+season — don’t miss the chance to get guided support early and stay ahead of the
+competition.
+You can explore the program here:
+👉 https://live.unsaidtalks.com/ump-starter

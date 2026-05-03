@@ -89,6 +89,16 @@ export const AnalyzeTopicsResponse = zod.object({
     .describe("Smart insight messages to display as floating bubbles"),
   paperCount: zod.number().describe("Number of papers analyzed"),
   planDays: zod.number().describe("Number of days in the study plan"),
+  questionTypeDistribution: zod
+    .object({
+      short: zod.number().describe("Short-answer questions count"),
+      long: zod.number().describe("Long\/essay questions count"),
+      mcq: zod.number().describe("Multiple choice questions count"),
+      numerical: zod
+        .number()
+        .describe("Numerical\/calculation questions count"),
+    })
+    .describe("Distribution of question types found in papers"),
 });
 
 /**

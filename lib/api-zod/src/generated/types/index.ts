@@ -16,6 +16,7 @@ export * from "./generateQuestionsRequest";
 export * from "./generateQuestionsResult";
 export * from "./healthStatus";
 export * from "./paperQuestion";
+export * from "./questionTypeDistribution";
 export * from "./studyPlanDay";
 export * from "./topicScore";
 export * from "./topicScorePriority";

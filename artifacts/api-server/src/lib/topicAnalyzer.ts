@@ -289,6 +289,40 @@ export function generateStudyPlan(
   });
 }
 
+export function detectQuestionTypes(text: string): {
+  short: number;
+  long: number;
+  mcq: number;
+  numerical: number;
+} {
+  const lower = text.toLowerCase();
+
+  // MCQ patterns
+  const mcqMatches = (lower.match(/\b(a\)|b\)|c\)|d\)|\(a\)|\(b\)|\(c\)|\(d\)|option [abcd]|choose the correct|which of the following|select the)/g) || []).length;
+
+  // Numerical/calculation patterns
+  const numericalMatches = (lower.match(/\b(calculate|compute|find the value|determine the|evaluate|solve for|how many|what is the value|derive|show that[\s\S]{0,20}\d|\d+\s*(marks|m)\b)/g) || []).length;
+
+  // Long/essay patterns
+  const longMatches = (lower.match(/\b(discuss|critically analyze|explain in detail|elaborate|write an essay|describe the role|assess|compare and contrast|evaluate the impact|to what extent|justify your|what are the implications|examine)/g) || []).length;
+
+  // Short answer patterns  
+  const shortMatches = (lower.match(/\b(define|state|list|mention|what is|who is|when did|write a note|briefly explain|give an example|what are the|name the|identify)/g) || []).length;
+
+  // Normalize so they sum to something reasonable
+  const total = mcqMatches + numericalMatches + longMatches + shortMatches;
+  if (total === 0) {
+    return { short: 4, long: 3, mcq: 2, numerical: 1 };
+  }
+
+  return {
+    short: Math.max(1, shortMatches),
+    long: Math.max(1, longMatches),
+    mcq: Math.max(0, mcqMatches),
+    numerical: Math.max(0, numericalMatches),
+  };
+}
+
 export function generateThoughtBubbles(
   topics: ReturnType<typeof scoreTopics>
 ): string[] {

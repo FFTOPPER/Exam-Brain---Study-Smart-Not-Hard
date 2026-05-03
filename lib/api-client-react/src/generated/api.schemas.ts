@@ -72,6 +72,17 @@ export interface StudyPlanDay {
   timeHours: number;
 }
 
+export interface QuestionTypeDistribution {
+  /** Short-answer questions count */
+  short: number;
+  /** Long/essay questions count */
+  long: number;
+  /** Multiple choice questions count */
+  mcq: number;
+  /** Numerical/calculation questions count */
+  numerical: number;
+}
+
 export interface AnalysisResult {
   topics: TopicScore[];
   /** Top 3 most important topics */
@@ -89,6 +100,8 @@ export interface AnalysisResult {
   paperCount: number;
   /** Number of days in the study plan */
   planDays: number;
+  /** Distribution of question types found in papers */
+  questionTypeDistribution: QuestionTypeDistribution;
 }
 
 export interface GenerateQuestionsRequest {

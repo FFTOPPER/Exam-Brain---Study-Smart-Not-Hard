@@ -2,7 +2,7 @@ import { Router } from "express";
 import { z } from "zod/v4";
 import { AnalyzeTopicsBody, AnalyzeTopicsResponse } from "@workspace/api-zod";
 import { sessionStore } from "../lib/sessionStore";
-import { analyzeText, scoreTopics, generateStudyPlan, generateThoughtBubbles } from "../lib/topicAnalyzer";
+import { analyzeText, scoreTopics, generateStudyPlan, generateThoughtBubbles, detectQuestionTypes } from "../lib/topicAnalyzer";
 
 const router = Router();
 
@@ -37,6 +37,7 @@ router.post("/analyze", async (req, res) => {
 
   const rawTopics = analyzeText(text);
   const scoredTopics = scoreTopics(rawTopics, paperCount);
+  const questionTypeDistribution = detectQuestionTypes(text);
 
   const topTopics = scoredTopics
     .filter(t => t.priority === "high" || t.priority === "medium")
@@ -70,6 +71,7 @@ router.post("/analyze", async (req, res) => {
     thoughtBubbles,
     paperCount,
     planDays,
+    questionTypeDistribution,
   });
 
   res.json(result);

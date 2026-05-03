@@ -226,6 +226,27 @@ components:
         - goal
         - timeHours
 
+    QuestionTypeDistribution:
+      type: object
+      properties:
+        short:
+          type: integer
+          description: Short-answer questions count
+        long:
+          type: integer
+          description: Long/essay questions count
+        mcq:
+          type: integer
+          description: Multiple choice questions count
+        numerical:
+          type: integer
+          description: Numerical/calculation questions count
+      required:
+        - short
+        - long
+        - mcq
+        - numerical
+
     AnalysisResult:
       type: object
       properties:
@@ -266,6 +287,9 @@ components:
         planDays:
           type: integer
           description: Number of days in the study plan
+        questionTypeDistribution:
+          $ref: "#/components/schemas/QuestionTypeDistribution"
+          description: Distribution of question types found in papers
       required:
         - topics
         - topTopics
@@ -276,6 +300,7 @@ components:
         - thoughtBubbles
         - paperCount
         - planDays
+        - questionTypeDistribution
 
     GenerateQuestionsRequest:
       type: object
