@@ -1,0 +1,179 @@
+Improve the existing UI of the web app "Exam Brain – Study Smart, Not Hard".
+
+IMPORTANT:
+Do NOT rebuild from scratch. Enhance the current UI with better structure, clarity, and polish.
+
+---
+
+## ADD TOP NAVBAR (VERY IMPORTANT)
+
+Create a fixed top navigation bar with:
+
+LEFT SIDE:
+
+* App name: "Exam Brain"
+* Tagline below it (small text): "Study Smart, Not Hard"
+
+CENTER (optional subtle):
+
+* Animated glowing dot or pulse (to indicate AI thinking)
+
+RIGHT SIDE:
+
+* Buttons:
+
+  * "Upload Papers"
+  * "Last Night Mode"
+  * "Generate Question Paper"
+
+STYLE:
+
+* Transparent dark glass effect
+* Slight blur (backdrop-filter)
+* Soft glowing border (blue/purple)
+
+---
+
+## ADD HERO TITLE (ABOVE MAIN UI)
+
+Above the main content, add:
+
+BIG TITLE:
+"Inside Your Exam Mind"
+
+SUBTEXT:
+"We read your question papers and tell you exactly what to study"
+
+Make it centered and slightly glowing.
+
+---
+
+## LEFT SIDE IMPROVEMENTS (STUDENT AREA)
+
+Keep the 3D student but improve:
+
+* Add soft glowing circular aura behind student
+* Add slow floating animation (up-down)
+* Add subtle particle effects
+
+THOUGHT BUBBLES:
+
+* Animate bubbles (fade in / float slightly)
+* Add slight delay between each bubble
+* Improve text styling (bold key words like "Study THIS first")
+
+Add a small label below student:
+"Your Study Assistant"
+
+---
+
+## RIGHT PANEL IMPROVEMENTS
+
+Improve hierarchy:
+
+SECTION TITLE:
+"Your Strategy"
+
+Below it:
+"Based on X papers"
+
+Make "Exam Readiness" card more prominent:
+
+* Bigger percentage
+* Add circular progress indicator
+
+---
+
+TOPIC CARDS IMPROVEMENT:
+
+Each topic card should include:
+
+* Topic name
+* Topic code (T1, T2...)
+* "Asked X times"
+* Priority badge (HIGH / MEDIUM / LOW)
+
+Color coding:
+
+* HIGH → red/orange glow
+* MEDIUM → blue
+* LOW → green
+
+---
+
+PRACTICE QUESTIONS UI:
+
+Instead of plain text:
+
+* Add collapsible section:
+  "Practice Questions"
+
+* Show questions as:
+  Q1
+  Q2
+  Q3
+
+* Add "Regenerate" button if generation fails
+
+---
+
+EMPTY STATE FIX (IMPORTANT)
+
+If no data:
+Show message:
+
+"Upload your question papers to get started"
+
+Add animated arrow pointing to upload button
+
+---
+
+MICRO-INTERACTIONS (VERY IMPORTANT)
+
+* Hover effect on topic cards
+* Smooth transitions
+* Button glow on hover
+* Slight scale animation
+
+---
+
+BACKGROUND IMPROVEMENT
+
+* Add gradient background (dark blue → purple)
+* Add subtle moving particles
+* Add radial glow behind student
+
+---
+
+FOOTER (SMALL BUT IMPACTFUL)
+
+Add bottom text:
+
+"Built for students who want to study smart, not hard"
+
+---
+
+LANGUAGE STYLE
+
+Keep all text simple and human:
+
+GOOD:
+"Study this first"
+"Asked many times"
+"Skip if short on time"
+
+BAD:
+"Analytical insights"
+"Predictive modeling"
+
+---
+
+FINAL GOAL
+
+The UI should feel:
+
+* Like a real product
+* Not like a template
+* Slightly emotional (student stress → clarity)
+
+---
