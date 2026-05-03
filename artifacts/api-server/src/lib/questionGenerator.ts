@@ -20,7 +20,7 @@ export async function generatePracticeQuestions(
         content: `Generate ${count} university exam questions for the topic: "${topicLabel}". Keep them simple, specific, and exam-focused. Mix short answer and essay style.`,
       },
     ],
-    max_tokens: 400,
+    max_completion_tokens: 400,
     temperature: 0.7,
   });
 
@@ -59,7 +59,7 @@ Return a JSON array with this exact format:
 Vary marks (5, 8, 10, 15). Keep questions clear and exam-appropriate.`,
       },
     ],
-    max_tokens: 800,
+    max_completion_tokens: 800,
     temperature: 0.6,
     response_format: { type: "json_object" },
   });
