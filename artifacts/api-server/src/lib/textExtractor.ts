@@ -18,8 +18,26 @@ export async function extractTextFromBuffer(
     }
   }
 
+  if (
+    mimetype === "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ||
+    mimetype === "application/msword"
+  ) {
+    try {
+      const mammoth = require("mammoth");
+      const result = await mammoth.extractRawText({ buffer });
+      return result.value || "";
+    } catch (err) {
+      console.error(`Failed to parse Word document ${filename}:`, err);
+      return `[Could not extract text from ${filename}]`;
+    }
+  }
+
+  if (mimetype === "text/plain") {
+    return buffer.toString("utf-8");
+  }
+
   if (mimetype.startsWith("image/")) {
-    return `[Image file: ${filename} — text extraction from images not supported yet]`;
+    return `[Image file: ${filename} — text extraction from images is not supported yet]`;
   }
 
   return "";
