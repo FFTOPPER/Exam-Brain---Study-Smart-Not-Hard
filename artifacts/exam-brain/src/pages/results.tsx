@@ -150,10 +150,9 @@ export default function Results() {
               disabled={generatePaperMutation.isPending}
             >
               {generatePaperMutation.isPending
-                ? <Loader2 className="w-4 h-4 animate-spin" />
-                : <FileText className="w-4 h-4" />
+                ? <><Loader2 className="w-4 h-4 animate-spin" /> Generating (~30s)...</>
+                : <><FileText className="w-4 h-4" /> Generate Question Paper</>
               }
-              Generate Question Paper
             </Button>
             <Button
               variant={lastNightMode ? 'default' : 'outline'}
@@ -259,9 +258,12 @@ export default function Results() {
                               Practice Questions
                             </p>
                             {loadingTopics.has(topic.topic) ? (
-                              <div className="flex items-center gap-2 text-sm text-muted-foreground py-2">
-                                <Loader2 className="w-4 h-4 animate-spin text-primary" />
-                                Generating exam-style questions...
+                              <div className="space-y-1 py-2">
+                                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                  <Loader2 className="w-4 h-4 animate-spin text-primary flex-shrink-0" />
+                                  Generating questions — this takes about 30 seconds...
+                                </div>
+                                <p className="text-xs text-muted-foreground/60 pl-6">AI is writing exam-style questions for you</p>
                               </div>
                             ) : topicQuestions[topic.topic] ? (
                               <ul className="space-y-2.5">

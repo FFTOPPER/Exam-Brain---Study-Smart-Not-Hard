@@ -8,27 +8,32 @@ export async function generatePracticeQuestions(
   const topicLabel = topicCode ? `${topic} (${topicCode})` : topic;
 
   const completion = await openai.chat.completions.create({
-    model: "gpt-5-mini",
+    model: "gpt-5",
     messages: [
       {
         role: "system",
         content:
-          "You are a university exam question generator. Generate concise, exam-style questions. Return ONLY a numbered list of questions, no preamble or commentary.",
+          "You are a university exam question generator. Return ONLY a numbered list of questions, one per line. No preamble, no commentary, just the questions.",
       },
       {
         role: "user",
-        content: `Generate ${count} university exam questions for the topic: "${topicLabel}". Keep them simple, specific, and exam-focused. Mix short answer and essay style.`,
+        content: `Generate ${count} university exam questions for the topic: "${topicLabel}". Mix short-answer and essay style. Be specific and exam-focused.`,
       },
     ],
-    max_completion_tokens: 400,
   });
 
   const raw = completion.choices[0]?.message?.content ?? "";
+
+  if (!raw.trim()) {
+    return defaultQuestions(topic, count);
+  }
+
   const lines = raw
     .split("\n")
-    .map(l => l.replace(/^\d+[\.\)]\s*/, "").trim())
-    .filter(l => l.length > 10);
+    .map(l => l.replace(/^\s*\d+[\.\)]\s*/, "").replace(/^\s*[-*•]\s*/, "").trim())
+    .filter(l => l.length > 10 && !l.match(/^(here|below|following|questions?):?$/i));
 
+  if (lines.length === 0) return defaultQuestions(topic, count);
   return lines.slice(0, count);
 }
 
@@ -36,48 +41,80 @@ export async function generateExpectedPaper(topics: string[]): Promise<
   Array<{ number: number; question: string; topic: string; marks: number }>
 > {
   const topicList = topics.slice(0, 5).join(", ");
+  const marksList = [10, 8, 15, 5, 12];
 
   const completion = await openai.chat.completions.create({
-    model: "gpt-5-mini",
+    model: "gpt-5",
     messages: [
       {
         role: "system",
         content:
-          "You are a university exam paper designer. Generate a concise, realistic exam paper. Respond in JSON array format only.",
+          "You are a university exam paper designer. Generate realistic, exam-appropriate questions.",
       },
       {
         role: "user",
-        content: `Generate 5 exam questions for a university paper covering these topics: ${topicList}.
+        content: `Generate one exam question each for these ${topics.slice(0, 5).length} topics: ${topicList}.
 
-Return a JSON array with this exact format:
-[
-  {"number": 1, "question": "...", "topic": "...", "marks": 10},
-  ...
-]
+Format your response EXACTLY like this, one question per topic:
+Q1. [question for topic 1] [${marksList[0]} marks]
+Q2. [question for topic 2] [${marksList[1]} marks]
+Q3. [question for topic 3] [${marksList[2]} marks]
+Q4. [question for topic 4] [${marksList[3]} marks]
+Q5. [question for topic 5] [${marksList[4]} marks]
 
-Vary marks (5, 8, 10, 15). Keep questions clear and exam-appropriate.`,
+Keep each question clear and specific.`,
       },
     ],
-    max_completion_tokens: 800,
-    response_format: { type: "json_object" },
   });
 
-  const raw = completion.choices[0]?.message?.content ?? "{}";
-  try {
-    const parsed = JSON.parse(raw);
-    const arr = Array.isArray(parsed) ? parsed : (parsed.questions ?? parsed.paper ?? []);
-    return arr.slice(0, 5).map((q: any, i: number) => ({
-      number: q.number ?? i + 1,
-      question: q.question ?? "",
-      topic: q.topic ?? topics[i] ?? "",
-      marks: q.marks ?? 10,
-    }));
-  } catch {
+  const raw = completion.choices[0]?.message?.content ?? "";
+
+  if (!raw.trim()) {
     return topics.slice(0, 5).map((t, i) => ({
       number: i + 1,
-      question: `Explain the key concepts of ${t} with examples.`,
+      question: `Explain the key concepts of ${t} with relevant examples. Discuss its practical applications.`,
       topic: t,
-      marks: 10,
+      marks: marksList[i] ?? 10,
     }));
   }
+
+  const lines = raw
+    .split("\n")
+    .map(l => l.trim())
+    .filter(l => l.match(/^Q?\d+[\.\)]/i));
+
+  if (lines.length === 0) {
+    // Try splitting by double newlines or any non-empty lines
+    const fallbackLines = raw
+      .split("\n")
+      .map(l => l.trim())
+      .filter(l => l.length > 20);
+
+    return fallbackLines.slice(0, 5).map((q, i) => ({
+      number: i + 1,
+      question: q.replace(/^Q?\d+[\.\):\s]+/i, "").trim(),
+      topic: topics[i] ?? "",
+      marks: marksList[i] ?? 10,
+    }));
+  }
+
+  return lines.slice(0, 5).map((line, i) => ({
+    number: i + 1,
+    question: line
+      .replace(/^Q?\d+[\.\):\s]+/i, "")
+      .replace(/\[\d+\s*marks?\]/i, "")
+      .trim(),
+    topic: topics[i] ?? "",
+    marks: marksList[i] ?? 10,
+  }));
+}
+
+function defaultQuestions(topic: string, count: number): string[] {
+  return [
+    `Define ${topic} and explain its core principles with examples.`,
+    `Discuss the real-world applications and importance of ${topic}.`,
+    `Compare and contrast different approaches or methods in ${topic}.`,
+    `What are the key challenges and solutions associated with ${topic}?`,
+    `Explain how ${topic} has evolved and its future implications.`,
+  ].slice(0, count);
 }
